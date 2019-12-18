@@ -12,48 +12,36 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <%
-            String Login= request.getParameter("sinenome");
-            String Senha=request.getParameter("sinesenha");
-            
-            
-            SineBahia sine= new SineBahia();
-            
-            sine.setSLogin(Login);
-            sine.setSSenha(Senha);
-            
-            
+       <%
+            SineBahia bd = new SineBahia();
+            bd.setLogEmail(request.getParameter("logemail"));
+            bd.setLogSenha(request.getParameter("logsenha"));
+            boolean a = false;
             try {
                 Class.forName("com.mysql.jdbc.Driver");
-                Connection conexao = DriverManager.getConnection("jdbc:mysql://localhost:3306/cadastro", "root", "");
-                
-                //String sqlConsulta = "select * from cliente where nome=";
-                 String sqlLogin = "SELECT * FROM login WHERE (nome,senha) LIKE'%'"; 
-                //String sqlConsulta = "SELECT idTeste, Nome FROM teste WHERE Nome = 'Marcos'";
-                
-                PreparedStatement stmt2 = conexao.prepareStatement(sqlLogin);
+                Connection conexao = DriverManager.getConnection("jdbc:mysql://localhost:3306/boletim", "root", "");
+                String sqlConsulta = "SELECT * FROM login WHERE email LIKE '%" + bd.getLogEmail() + "%' AND senha LIKE '%" + bd.getLogSenha()+ "%'";
+                PreparedStatement stmt2 = conexao.prepareStatement(sqlConsulta);
                 ResultSet rs = stmt2.executeQuery();
-                
                 while (rs.next()) {
-                    if((Login==rs.getString("nome"))&&(Senha==rs.getString("senha"))){
-                    
-                    JOptionPane.showMessageDialog(null,"Logado");
-                    
-                 response.sendRedirect("Professor.html");
-                    
-                    
+                    a = true;
+                    String email = rs.getString("email");
+                    String senha = rs.getString("senha");
+                    if (bd.getLogEmail().equals(email) && bd.getLogSenha().equals(senha)) {
+                        
+                       
+                        response.sendRedirect("menualuno.html");
                     }
-                        
-                        
-                        
-                    
                 }
-                 
-                    
-                    }                
-             catch (Exception e) {
-                out.println("Erro ao selecionar dados " + e);
+                if (a == false) {
+                    JOptionPane.showMessageDialog(null, "Login ou senha incorreta");
+                    response.sendRedirect("index.html");
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Erro" + e);
             }
         %>
+        
+        
     </body>
 </html>
